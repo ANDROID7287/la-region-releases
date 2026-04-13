@@ -27,8 +27,6 @@ jobs:
 
       - name: Update the README.md
         run: |
-          # 3. Use 'sed' (a text stream editor) to find the old link and swap it with the new one
-          # This regex finds any URL ending in .exe in your releases/download folder
           sed -i -E 's|https://github\.com/${{ github.repository }}/releases/download/[^/]+/[^")]+\.exe|'"$NEW_URL"'|g' README.md
 
       - name: Commit and Push changes
