@@ -1,6 +1,5 @@
 name: Update README Download Link
 
-# This tells the bot to run ONLY when a new release is published
 on:
   release:
     types: [published]
@@ -9,7 +8,7 @@ jobs:
   update-readme:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Allows the bot to commit changes
+      contents: write
       
     steps:
       - name: Checkout repository
@@ -20,11 +19,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 1. Ask GitHub for the name of the .exe file in this new release
           EXE_NAME=$(gh release view ${{ github.event.release.tag_name }} --json assets -q '.assets[].name' | grep -i '\.exe$' | head -n 1)
           echo "Found file: $EXE_NAME"
           
-          # 2. Construct the brand new direct download URL
           NEW_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/$EXE_NAME"
           echo "NEW_URL=$NEW_URL" >> $GITHUB_ENV
 
@@ -36,10 +33,8 @@ jobs:
 
       - name: Commit and Push changes
         run: |
-          # 4. Pretend to be a bot user and push the changes back to the main branch
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
           
-          # Only commit if the file actually changed
           git diff --quiet && git diff --staged --quiet || (git commit -m "docs: auto-update download link to ${{ github.event.release.tag_name }}" && git push)
